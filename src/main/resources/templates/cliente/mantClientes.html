@@ -188,7 +188,7 @@ $(document).ready(function() {
 		$("#tituloModal").text("Registrar Cliente");
 		$("#formCliente").attr("action","/gestioncliente/registrar");
 		$("#idCliente").val(0);
-		$("#tipoDocumento").val("");
+		$("#tipoDocumento").val("DNI");
 		$("#numeroDocumento").val("");
 		$("#nombres").val("");
 		$("#apellidos").val("");
@@ -227,125 +227,123 @@ $(document).ready(function() {
 				  
 				  <!--*{idCliente} es la entidad e id="idCliente" es a lo que le 
 					pasara su referencia o datos-->
-				  <input type="hidden" id="idCliente" th:field="*{idCliente}">
+				<input type="hidden" id="idCliente" th:field="*{idCliente}">
 			
-			<div class="modal-header">
-				<!--Agregar #tituloModal del script js Editar 
-					para cambiarle el nombre a Editar Cliente-->
-				<h5 class="modal-title" id="tituloModal">
-					Registrar Cliente
-				</h5>
-				<button type="button"
-						class="btn-close"
-						data-bs-dismiss="modal">
-				</button>
-			</div>
+				<div class="modal-header">
+					<!--Agregar #tituloModal del script js Editar 
+						para cambiarle el nombre a Editar Cliente-->
+					<h5 class="modal-title" id="tituloModal">
+						Registrar Cliente
+					</h5>
+					<button type="button"
+							class="btn-close"
+							data-bs-dismiss="modal">
+					</button>
+				</div>
 			
 			
-			<div class="modal-body">
-				<div class="row">
-					<!---->
-					<div class="col-md-6 mb-3">
+				<div class="modal-body">
+					<div class="row">
+						<!---->
+						<div class="col-md-6 mb-3">
+							
+							<!-- BomboBox innecesario cuando se requiera usar una 
+								instancia de clase, en la principal -->
+							<!--
+							<label>Marca Bus</label>
+							/*poner id en select*/
+							<select class="form-select">
+							/*No olvidar poner el en value="0" y seleccione marca, esto va por el indice
+							Seleccione Cliente es indice 0 */
+								<option value="">
+									Seleccione Cliente
+								</option>
+								<option
+									th:each="xxxxxxxxxxx"
+									th:value="xxxxxxxxxxx"
+									th:text="xxxxxxxxxxxx">
+								</option>
+							</select>
+						</div>
+							-->
 						
-						<!-- BomboBox innecesario cuando se requiera usar una 
-							instancia de clase, en la principal -->
-						<!--
-						<label>Marca Bus</label>
-						/*poner id en select*/
-						<select class="form-select">
-						/*No olvidar poner el en value="0" y seleccione marca, esto va por el indice
-						Seleccione Cliente es indice 0 */
-							<option value="">
-								Seleccione Cliente
-							</option>
-							<option
-								th:each="xxxxxxxxxxx"
-								th:value="xxxxxxxxxxx"
-								th:text="xxxxxxxxxxxx">
-							</option>
-						</select>
-					</div>
-						-->
-					
-					<!---->
-					<div class="col-md-6 mb-3">
-						<label>Tipo Documento</label>
-						<select id="tipoDocumento" class="form-select" th:field="*{tipoDocumento}">
+						<!---->
+						<div class="col-md-6 mb-3">
+							<label>Tipo Documento</label>
+							<select id="tipoDocumento" class="form-select" th:field="*{tipoDocumento}">
+								<!--No olvidar el Value para que se guarde el texto-->
+								<option value="DNI">DNI</option>
+								<option value="CE">CE</option>
+							</select>
+						</div>
+						<!---->
+						<div class="col-md-6 mb-3">
+							<label>Num Documento</label>
+							<input id="numeroDocumento" type="text" class="form-control" th:field="*{numeroDocumento}">
+						</div>
+						<!---->
+						<div class="col-md-6 mb-3">
+							<label>Nombres</label>
+							<input id="nombres" type="text" class="form-control" th:field="*{nombres}">
+						</div>
+						<!---->
+						<div class="col-md-6 mb-3">
+							<label>Apellidos</label>
+							<input id="apellidos" type="text" class="form-control" th:field="*{apellidos}">
+						</div>										
+						<!---->
+						<div class="col-md-6 mb-3">
+							<label>Teléfono</label>
+							<input id="telefono" type="text" class="form-control" th:field="*{telefono}">
+						</div>
+						<!---->
+						<div class="col-md-6 mb-3">
+							<label>Correo</label>
+							<input id="correo" type="email" class="form-control" th:field="*{correo}">
+						</div>
+						<!---->
+						
+						<div class="col-md-6 mb-3">
+							<label>Dirección</label>
+							<input id="direccion" type="text" class="form-control" th:field="*{direccion}">
+						</div>
+						<!---->
+						<div class="col-md-6 mb-3">
+							<label>Estado</label>
 							<!--No olvidar el Value para que se guarde el texto-->
-							<option value="DNI">DNI</option>
-							<option value="CE">CE</option>
-						</select>
-					</div>
-					<!---->
-					<div class="col-md-6 mb-3">
-						<label>Num Documento</label>
-						<input id="numeroDocumento" type="text" class="form-control" th:field="*{numeroDocumento}">
-					</div>
-					<!---->
-					<div class="col-md-6 mb-3">
-						<label>Nombres</label>
-						<input id="nombres" type="text" class="form-control" th:field="*{nombres}">
-					</div>
-					<!---->
-					<div class="col-md-6 mb-3">
-						<label>Apellidos</label>
-						<input id="apellidos" type="text" class="form-control" th:field="*{apellidos}">
-					</div>										
-					<!---->
-					<div class="col-md-6 mb-3">
-						<label>Teléfono</label>
-						<input id="telefono" type="text" class="form-control" th:field="*{telefono}">
-					</div>
-					<!---->
-					<div class="col-md-6 mb-3">
-						<label>Correo</label>
-						<input id="correo" type="email" class="form-control" th:field="*{correo}">
-					</div>
-					<!---->
-					
-					<div class="col-md-6 mb-3">
-						<label>Dirección</label>
-						<input id="direccion" type="text" class="form-control" th:field="*{direccion}">
-					</div>
-					<!---->
-					<div class="col-md-6 mb-3">
-						<label>Estado</label>
-						<!--No olvidar el Value para que se guarde el texto-->
-						<select id="estado" class="form-select" th:field="*{estado}">
-							<option value="ACTIVO">ACTIVO</option>
-							<option value="INACTIVO">INACTIVO</option>
-						</select>
+							<select id="estado" class="form-select" th:field="*{estado}">
+								<option value="ACTIVO">ACTIVO</option>
+								<option value="INACTIVO">INACTIVO</option>
+							</select>
+						</div>
 					</div>
 				</div>
-			</div>
 
-			<div class="modal-footer">
-			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-					Cerrar
+				<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+						Cerrar
+					</button>
+					<!--Cambiar button por submit-->
+					<button type="submit"
+							class="btn btn-primary">
+						Guardar
 				</button>
-				<!--Cambiar button por submit-->
-				<button type="submit"
-						class="btn btn-primary">
-					Guardar
-				</button>
-			</div>
+				</div>
 		</form>
 		</div>
 	</div>
 </div>
 
-<script>
-setTimeout(function() {
-	/*id de msg, variable controlador, (alerta) */
-	let mensaje = document.getElementById("msg");
-	if(mensaje){
-		let alerta =new bootstrap.Alert(mensaje);
-	alerta.close();
-	}
-}, 3000);
-</script>
-
-
+	<script>
+	setTimeout(function() {
+		/*id de msg, variable controlador, (alerta) */
+		let mensaje = document.getElementById("msg");
+		if(mensaje){
+			let alerta =new bootstrap.Alert(mensaje);
+		alerta.close();
+		}
+	}, 3000);
+	</script>
 
 </body>
 </html>

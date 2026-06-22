@@ -1,12 +1,230 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>Lista de Ciudades</title>
+<title>Gestión de Citas - PetCare</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
+<style>
+  body { background: #f0f2f5; }
+  .navbar-petcare { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+  .page-card { border: none; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+  .page-card .card-header { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); border-radius: 16px 16px 0 0; padding: 18px 24px; }
+  .btn-nuevo { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); border: none; font-weight: 600; border-radius: 10px; padding: 8px 20px; color: #1a5c3a; }
+  .btn-nuevo:hover { opacity: 0.9; color: #1a5c3a; }
+  .modal-header { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; border-radius: 12px 12px 0 0; }
+  .modal-header .btn-close { filter: invert(1); }
+  .modal-content { border-radius: 12px; border: none; }
+  .form-label { font-weight: 600; font-size: 0.85rem; color: #555; }
+  .form-control, .form-select { border-radius: 8px; border-color: #dde1f0; }
+  .form-control:focus, .form-select:focus { border-color: #11998e; box-shadow: 0 0 0 3px rgba(17,153,142,0.15); }
+  .nav-link-item { color: rgba(255,255,255,0.85) !important; font-weight: 500; padding: 8px 14px; border-radius: 8px; }
+  .nav-link-item:hover { background: rgba(255,255,255,0.15); color: white !important; }
+</style>
 </head>
 <body>
 
-	<h1>LISTA DE CITAS</h1>
+<nav class="navbar navbar-expand-lg navbar-petcare mb-4">
+  <div class="container-fluid px-4">
+    <span class="navbar-brand text-white fw-bold"><i class="bi bi-heart-pulse-fill me-2"></i>PetCare</span>
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item"><a class="nav-link nav-link-item active bg-white bg-opacity-25" href="/gestioncita/lista"><i class="bi bi-calendar2-check me-1"></i>Citas</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-item" href="/gestioncliente/lista"><i class="bi bi-people me-1"></i>Clientes</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-item" href="/gestionmascota/lista"><i class="bi bi-github me-1"></i>Mascotas</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-item" href="/gestionmedico/lista"><i class="bi bi-person-badge me-1"></i>Médicos</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-item" href="/gestionusuario/lista"><i class="bi bi-person-gear me-1"></i>Usuarios</a></li>
+      </ul>
+      <a href="/inicioSesion/logout" class="btn btn-outline-light btn-sm rounded-pill"><i class="bi bi-box-arrow-right me-1"></i>Cerrar Sesión</a>
+    </div>
+  </div>
+</nav>
 
+<div class="container-fluid px-4 pb-4">
+  <div class="card page-card">
+    <div class="card-header d-flex align-items-center justify-content-between">
+      <h5 class="mb-0 text-white fw-bold"><i class="bi bi-calendar2-check-fill me-2"></i>Gestión de Citas Médicas</h5>
+      <span class="badge bg-white" style="color:#11998e;">Módulo Citas</span>
+    </div>
+    <div class="card-body p-4">
+
+      <div id="msg" th:if="${msg}" class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 py-2">
+        <i class="bi bi-check-circle-fill"></i>
+        <span th:text="${msg}"></span>
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+      </div>
+
+      <div class="mb-3">
+        <button id="btnNuevo" class="btn btn-nuevo" data-bs-toggle="modal" data-bs-target="#ventanaModal">
+          <i class="bi bi-plus-circle me-1"></i> Nueva Cita
+        </button>
+      </div>
+
+      <div class="table-responsive">
+        <table id="tablaCita" class="table table-bordered table-hover align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th>ID</th><th>Cliente</th><th>Mascota</th><th>Médico</th>
+              <th>Fecha</th><th>Hora</th><th>Motivo</th><th>Monto</th><th>Estado</th><th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="c : ${citas}">
+              <td th:text="${c.idCita}"></td>
+              <td th:text="${c.cliente != null} ? ${c.cliente.nombres + ' ' + c.cliente.apellidos} : 'Sin Cliente'"></td>
+              <td th:text="${c.mascota != null} ? ${c.mascota.nombre} : 'Sin Mascota'"></td>
+              <td th:text="${c.medico != null} ? ${c.medico.nombres + ' ' + c.medico.apellidos} : 'Sin Médico'"></td>
+              <td th:text="${c.fechaCita}"></td>
+              <td th:text="${c.horaCita}"></td>
+              <td th:text="${c.motivo}"></td>
+              <td><strong th:text="${'S/ ' + c.montoTotal}"></strong></td>
+              <td>
+                <span class="badge rounded-pill"
+                      th:classappend="${c.estadoCita == 'PROGRAMADA'} ? 'bg-primary' :
+                                      (${c.estadoCita == 'ATENDIDA'} ? 'bg-success' : 'bg-danger')"
+                      th:text="${c.estadoCita}"></span>
+              </td>
+              <td>
+                <button class="btn btn-warning btn-sm btnEditar" th:data-id="${c.idCita}" title="Editar">
+                  <i class="bi bi-pencil-square"></i>
+                </button>
+                <button class="btn btn-danger btn-sm btnCancelar" th:data-id="${c.idCita}" title="Cancelar">
+                  <i class="bi bi-x-circle"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+<script>
+$(document).ready(function() {
+  $('#tablaCita').DataTable({ language: { url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json' } });
+});
+
+$("#btnNuevo").click(function() {
+  $("#tituloModal").text("Registrar Cita");
+  $("#frmCita").attr("action", "/gestioncita/registrar");
+  $("#idCita").val(0);
+  $("#idCliente").val(0); $("#idMascota").val(0); $("#idMedico").val(0);
+  $("#fechaCita").val(""); $("#horaCita").val("");
+  $("#motivo").val(""); $("#montoTotal").val("");
+  $("#estadoCita").val("PROGRAMADA");
+});
+
+$(document).on("click", ".btnEditar", function() {
+  let id = $(this).data("id");
+  $("#tituloModal").text("Editar Cita");
+  $("#frmCita").attr("action", "/gestioncita/actualizar");
+  $.get("/gestioncita/buscar/" + id, function(data) {
+    $("#idCita").val(data.idCita);
+    // CORRECCIÓN: también cargamos el cliente
+    if (data.cliente) { $("#idCliente").val(data.cliente.idCliente); }
+    if (data.mascota) { $("#idMascota").val(data.mascota.idMascota); }
+    if (data.medico)  { $("#idMedico").val(data.medico.idMedico); }
+    $("#fechaCita").val(data.fechaCita);
+    $("#horaCita").val(data.horaCita);
+    $("#motivo").val(data.motivo);
+    $("#montoTotal").val(data.montoTotal);
+    $("#estadoCita").val(data.estadoCita);
+    $("#ventanaModal").modal("show");
+  });
+});
+
+$(document).on("click", ".btnCancelar", function() {
+  let id = $(this).data("id");
+  if (confirm("¿Desea cancelar esta cita?")) {
+    window.location = "/gestioncita/cancelar/" + id;
+  }
+});
+
+setTimeout(function() {
+  let m = document.getElementById("msg");
+  if (m) { new bootstrap.Alert(m).close(); }
+}, 3000);
+</script>
+
+<!-- Modal -->
+<div class="modal fade" id="ventanaModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form id="frmCita" th:action="@{/gestioncita/registrar}" th:object="${cita}" method="post">
+        <input type="hidden" id="idCita" th:field="*{idCita}">
+        <div class="modal-header">
+          <h5 class="modal-title" id="tituloModal"><i class="bi bi-calendar-plus-fill me-2"></i>Registrar Cita</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="row g-3">
+            <!-- CORRECCIÓN: se agrega select de Cliente que faltaba -->
+            <div class="col-md-6">
+              <label class="form-label">Cliente</label>
+              <select id="idCliente" class="form-select" th:field="*{cliente.idCliente}">
+                <option value="0">-- Seleccione Cliente --</option>
+                <option th:each="cl : ${clientes}" th:value="${cl.idCliente}"
+                        th:text="${cl.nombres + ' ' + cl.apellidos}"></option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Mascota</label>
+              <select id="idMascota" class="form-select" th:field="*{mascota.idMascota}">
+                <option value="0">-- Seleccione Mascota --</option>
+                <option th:each="m : ${mascotas}" th:value="${m.idMascota}"
+                        th:text="${m.nombre + ' (' + m.especie + ')'}"></option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Médico Veterinario</label>
+              <select id="idMedico" class="form-select" th:field="*{medico.idMedico}">
+                <option value="0">-- Seleccione Médico --</option>
+                <option th:each="med : ${medicos}" th:value="${med.idMedico}"
+                        th:text="${med.nombres + ' ' + med.apellidos}"></option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Fecha de Cita</label>
+              <input id="fechaCita" type="date" class="form-control" th:field="*{fechaCita}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Hora de Cita</label>
+              <input id="horaCita" type="time" class="form-control" th:field="*{horaCita}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Monto Total (S/)</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light">S/</span>
+                <input id="montoTotal" type="number" step="0.01" class="form-control" th:field="*{montoTotal}" placeholder="0.00">
+              </div>
+            </div>
+            <div class="col-md-9">
+              <label class="form-label">Motivo de la Consulta</label>
+              <input id="motivo" type="text" class="form-control" th:field="*{motivo}" placeholder="Describa el motivo de la consulta">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Estado</label>
+              <select id="estadoCita" class="form-select" th:field="*{estadoCita}">
+                <option value="PROGRAMADA">PROGRAMADA</option>
+                <option value="ATENDIDA">ATENDIDA</option>
+                <option value="CANCELADA">CANCELADA</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><i class="bi bi-x me-1"></i>Cerrar</button>
+          <button type="submit" class="btn btn-primary px-4"><i class="bi bi-save me-1"></i>Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 </body>
 </html>

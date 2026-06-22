@@ -38,12 +38,18 @@ public class LoginController {
         Usuario objUsuario = serviceUsuario.validarIngreso(username, password);
         
         if (objUsuario != null) {
-            // Si el estado es "INACTIVO", se podría bloquear aquí
+        	// CORRECCIÓN: bloquear usuarios INACTIVOS
+            if (objUsuario.getEstado().equals("INACTIVO")) {
+                redirect.addFlashAttribute("error", "Tu cuenta está desactivada. Contacta al administrador.");
+                // CORRECCIÓN: ruta corregida de /login a /inicioSesion/login
+                return "redirect:/inicioSesion/login";
+            }
             session.setAttribute("usuarioLogueado", objUsuario);
-            return "redirect:/gestioncita/lista"; 
+            return "redirect:/gestioncita/lista";
         } else {
             redirect.addFlashAttribute("error", "Usuario o contraseña incorrectos. Intente nuevamente.");
-            return "redirect:/login";
+         // CORRECCIÓN: antes apuntaba a "redirect:/login" (ruta inexistente)
+            return "redirect:/inicioSesion/login";
         }
     }
 
@@ -54,6 +60,6 @@ public class LoginController {
         session.invalidate();
         
         redirect.addFlashAttribute("msg", "Has cerrado sesión correctamente.");
-        return "redirect:/login";
+        return "redirect:/inicioSesion/login";
     }
 }

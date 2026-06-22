@@ -50,7 +50,7 @@ public class UsuarioController {
     // 2. Método Registrar
     @PostMapping("/registrar")
     public String registrarUsuario(Usuario usuario, RedirectAttributes redirect) {
-        usuario.setEstado("ACTIVO");
+        
         
         serviceUsuario.registrar(usuario);
         redirect.addFlashAttribute("msg", "Usuario registrado exitosamente en el sistema.");

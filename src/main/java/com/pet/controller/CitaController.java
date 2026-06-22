@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.pet.entity.Cita;
+import com.pet.entity.Cliente;
 import com.pet.entity.Mascota;
 import com.pet.entity.Medico;
 import com.pet.service.CitaService;
+import com.pet.service.ClienteService;
 import com.pet.service.MascotaService;
 import com.pet.service.MedicoService;
 
@@ -30,8 +32,13 @@ public class CitaController {
 
     @Autowired
     private MedicoService serviceMedico;
+    
+ // CORRECCIÓN: se agrega ClienteService para llenar el select de clientes en la vista
+    @Autowired
+    private ClienteService serviceCliente;
 
     // 1. Método Listar (Prepara toda la pantalla)
+    /*
     @GetMapping("/lista")
     public String listadoCitas(Model model) {
         model.addAttribute("mensaje", "Bienvenido al módulo de Gestión de Citas");
@@ -51,6 +58,27 @@ public class CitaController {
         
         model.addAttribute("cita", cita);
         
+        return "cita/mantCitas";
+    }
+    */
+    @GetMapping("/lista")
+    public String listadoCitas(Model model) {
+        model.addAttribute("mensaje", "Bienvenido al módulo de Gestión de Citas");
+
+        model.addAttribute("citas", serviceCita.listar());
+        model.addAttribute("mascotas", serviceMascota.listar());
+        model.addAttribute("medicos", serviceMedico.listar());
+        // CORRECCIÓN: agregar lista de clientes al modelo
+        model.addAttribute("clientes", serviceCliente.listar());
+
+        Cita cita = new Cita();
+        cita.setMascota(new Mascota());
+        cita.setMedico(new Medico());
+        // CORRECCIÓN: inicializar Cliente dentro de Cita
+        cita.setCliente(new Cliente());
+
+        model.addAttribute("cita", cita);
+
         return "cita/mantCitas";
     }
 
