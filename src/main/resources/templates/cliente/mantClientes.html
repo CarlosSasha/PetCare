@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>Mantenimiento de Buses</title>
+<title>Mantenimiento de Clientes</title>
 
 <!-- Bootstrap -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"rel="stylesheet">
@@ -32,7 +32,11 @@
 			<div class="d-flex justify-content-between mb-3">
 
 				<div>
-					<button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#ventanaModal">
+					<button id="btnNuevo" 
+					class="btn btn-success" 
+					data-bs-toggle="modal" 
+					data-bs-target="#ventanaModal">
+					
 					<i class="bi bi-plus-circle"></i>
 								Nuevo Cliente
 					</button>
@@ -41,7 +45,20 @@
 
 			</div>
 
-
+			<!-- Mensaje, esto va acompañado de un JavaScript, en la parte final-->
+			<!--msg es la variable creada en el controlador, 
+				los que llevan redirect.addFlashAttribute-->
+			<div id="msg"
+					th:if="${msg}"
+				class="alert alert-success alert-dismissible fade show">
+						    <span th:text="${msg}"></span>
+						    <button type="button"
+						            class="btn-close"
+						            data-bs-dismiss="alert">
+						    </button>
+			</div>
+			<!--END-->
+			
 			<table id="tablaCliente"
 				class="table table-bordered table-hover table-striped">
 
@@ -76,18 +93,24 @@
 						<td th:text="${c.direccion}"></td>	
 
 						<td>
+							<!--If Ternario, para cambiar el color al estado-->
 							<span class="badge bg-success"
+								th:classappend="${c.estado=='ACTIVO'} ? 'bg-success' : ' bg-danger'"
 								th:text="${c.estado}">
 							</span>
 						</td>
 
 						<td>
-
-							<button class="btn btn-warning btn-sm">
+							<!--Editar-->
+							<!--btn es para el script-->
+							<button class="btn btn-warning btn-sm btnEditar"
+									th:data-id="${c.idCliente}">
 									<i class="bi bi-pencil-square"></i>
 								</button>
-
-								<button class="btn btn-danger btn-sm">
+								<!--Eliminar-->
+								<!--btn es para el script-->
+								<button class="btn btn-danger btn-sm btnEliminar"
+										th:data-id="${c.idCliente}">
 									<i class="bi bi-trash"></i>
 								</button>
 
@@ -133,6 +156,62 @@ $(document).ready(function() {
 
 });
 
+	/* Editar */
+	$(document).on("click", ".btnEditar", function() {
+
+		let id = $(this).data("id");
+		/*#tituloModal, es el id para el H5, en ventana modal*/
+		$("#tituloModal").text("Editar Cliente");
+		/*Llamas a el controller y al metodo*/
+		$("#frmCliente").attr("action","/gestioncliente/actualizar");
+		/*Llamas al controller y al metodo buscar por id*/
+		$.get("/gestioncliente/buscar/" + id, 
+			function(data) {
+			$("#idCliente").val(data.idCliente);
+			$("#tipoDocumento").val(data.tipoDocumento);
+			$("#numeroDocumento").val(data.numeroDocumento);
+			$("#nombres").val(data.nombres);
+			$("#apellidos").val(data.apellidos);
+			$("#telefono").val(data.telefono);
+			$("#correo").val(data.correo);
+			$("#direccion").val(data.direccion);
+			$("#estado").val(data.estado);
+			/*#ventanModal, es el boton de nuevo cliente, arriba*/
+		$("#ventanaModal").modal("show");
+		});
+
+	});
+	/*END*/
+	
+	/*Para Cambiar el titulo al Modal Registrar y limpiar TextBox*/
+	$("#btnNuevo").click(function() {
+		$("#tituloModal").text("Registrar Cliente");
+		$("#formCliente").attr("action","/gestioncliente/registrar");
+		$("#idCliente").val(0);
+		$("#tipoDocumento").val("");
+		$("#numeroDocumento").val("");
+		$("#nombres").val("");
+		$("#apellidos").val("");
+		$("#telefono").val("");
+		$("#correo").val("");
+		$("#direccion").val("");
+		$("#estado").val("ACTIVO");
+	});
+	/*END*/
+	
+	/*Eliminar*/
+	$(document).on("click", ".btnEliminar", function() {
+
+		let id = $(this).data("id");
+
+		if(confirm("¿Desea desactivar a este Cliente?")) {
+			/*Llamas al controller y al metodo buscar por id*/
+			window.location ="/gestioncliente/desactivar/" + id;
+		}
+	});
+	/*END*/
+
+
 </script>
 
 <!--Venta Modal-->
@@ -140,11 +219,20 @@ $(document).ready(function() {
 	
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
-			<!--
-				
-			-->
+			<!-- Formulario par que funcione el registro -->
+			<form id="frmCliente" 
+				  th:action="@{/gestioncliente/registrar}"
+				  th:object="${cliente}"
+				  method="post">
+				  
+				  <!--*{idCliente} es la entidad e id="idCliente" es a lo que le 
+					pasara su referencia o datos-->
+				  <input type="hidden" id="idCliente" th:field="*{idCliente}">
+			
 			<div class="modal-header">
-				<h5 class="modal-title">
+				<!--Agregar #tituloModal del script js Editar 
+					para cambiarle el nombre a Editar Cliente-->
+				<h5 class="modal-title" id="tituloModal">
 					Registrar Cliente
 				</h5>
 				<button type="button"
@@ -156,10 +244,17 @@ $(document).ready(function() {
 			
 			<div class="modal-body">
 				<div class="row">
+					<!---->
 					<div class="col-md-6 mb-3">
-						<!--BomboBox innecesario-->
+						
+						<!-- BomboBox innecesario cuando se requiera usar una 
+							instancia de clase, en la principal -->
+						<!--
 						<label>Marca Bus</label>
+						/*poner id en select*/
 						<select class="form-select">
+						/*No olvidar poner el en value="0" y seleccione marca, esto va por el indice
+						Seleccione Cliente es indice 0 */
 							<option value="">
 								Seleccione Cliente
 							</option>
@@ -170,25 +265,55 @@ $(document).ready(function() {
 							</option>
 						</select>
 					</div>
+						-->
+					
+					<!---->
 					<div class="col-md-6 mb-3">
-						<label>Modelo</label>
-						<input type="text" class="form-control">
+						<label>Tipo Documento</label>
+						<select id="tipoDocumento" class="form-select" th:field="*{tipoDocumento}">
+							<!--No olvidar el Value para que se guarde el texto-->
+							<option value="DNI">DNI</option>
+							<option value="CE">CE</option>
+						</select>
 					</div>
+					<!---->
 					<div class="col-md-6 mb-3">
-						<label>Placa</label>
-						<input type="text" class="form-control">
+						<label>Num Documento</label>
+						<input id="numeroDocumento" type="text" class="form-control" th:field="*{numeroDocumento}">
 					</div>
+					<!---->
 					<div class="col-md-6 mb-3">
-
-						<label>Capacidad</label>
-
-						<input type="number" class="form-control">
+						<label>Nombres</label>
+						<input id="nombres" type="text" class="form-control" th:field="*{nombres}">
 					</div>
+					<!---->
+					<div class="col-md-6 mb-3">
+						<label>Apellidos</label>
+						<input id="apellidos" type="text" class="form-control" th:field="*{apellidos}">
+					</div>										
+					<!---->
+					<div class="col-md-6 mb-3">
+						<label>Teléfono</label>
+						<input id="telefono" type="text" class="form-control" th:field="*{telefono}">
+					</div>
+					<!---->
+					<div class="col-md-6 mb-3">
+						<label>Correo</label>
+						<input id="correo" type="email" class="form-control" th:field="*{correo}">
+					</div>
+					<!---->
+					
+					<div class="col-md-6 mb-3">
+						<label>Dirección</label>
+						<input id="direccion" type="text" class="form-control" th:field="*{direccion}">
+					</div>
+					<!---->
 					<div class="col-md-6 mb-3">
 						<label>Estado</label>
-						<select class="form-select">
-							<option>ACTIVO</option>
-							<option>INACTIVO</option>
+						<!--No olvidar el Value para que se guarde el texto-->
+						<select id="estado" class="form-select" th:field="*{estado}">
+							<option value="ACTIVO">ACTIVO</option>
+							<option value="INACTIVO">INACTIVO</option>
 						</select>
 					</div>
 				</div>
@@ -198,14 +323,28 @@ $(document).ready(function() {
 			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
 					Cerrar
 				</button>
-				<button type="button"
+				<!--Cambiar button por submit-->
+				<button type="submit"
 						class="btn btn-primary">
 					Guardar
 				</button>
 			</div>
+		</form>
 		</div>
 	</div>
 </div>
+
+<script>
+setTimeout(function() {
+	/*id de msg, variable controlador, (alerta) */
+	let mensaje = document.getElementById("msg");
+	if(mensaje){
+		let alerta =new bootstrap.Alert(mensaje);
+	alerta.close();
+	}
+}, 3000);
+</script>
+
 
 
 </body>
