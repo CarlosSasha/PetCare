@@ -10,38 +10,63 @@
 <!-- DataTables -->
 <link rel="stylesheet"
 	href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
+	
+<!--Estilos-->
+<style>
+  body { background: #f0f2f5; }
+  .navbar-petcare { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+  .page-card { border: none; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+  .page-card .card-header { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 16px 16px 0 0; padding: 18px 24px; }
+  .btn-nuevo { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); border: none; font-weight: 600; border-radius: 10px; padding: 8px 20px; color: #1a5c3a; }
+  .btn-nuevo:hover { opacity: 0.9; color: #1a5c3a; }
+  .modal-header { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border-radius: 12px 12px 0 0; }
+  .modal-header .btn-close { filter: invert(1); }
+  .modal-content { border-radius: 12px; border: none; }
+  .form-label { font-weight: 600; font-size: 0.85rem; color: #555; }
+  .form-control, .form-select { border-radius: 8px; border-color: #dde1f0; }
+  .form-control:focus, .form-select:focus { border-color: #4facfe; box-shadow: 0 0 0 3px rgba(79,172,254,0.15); }
+  .nav-link-item { color: rgba(255,255,255,0.85) !important; font-weight: 500; padding: 8px 14px; border-radius: 8px; }
+  .nav-link-item:hover { background: rgba(255,255,255,0.15); color: white !important; }
+</style>
 
 </head>
 
 <body>
 
-<div class="container-fluid mt-4">
+	<nav class="navbar navbar-expand-lg navbar-petcare mb-4">
+	  <div class="container-fluid px-4">
+	    <span class="navbar-brand text-white fw-bold"><i class="bi bi-heart-pulse-fill me-2"></i>PetCare</span>
+	    <div class="collapse navbar-collapse">
+	      <ul class="navbar-nav me-auto">
+	        <li class="nav-item"><a class="nav-link nav-link-item" href="/gestioncita/lista"><i class="bi bi-calendar2-check me-1"></i>Citas</a></li>
+	        <li class="nav-item"><a class="nav-link nav-link-item active bg-white bg-opacity-25" href="/gestioncliente/lista"><i class="bi bi-people me-1"></i>Clientes</a></li>
+	        <li class="nav-item"><a class="nav-link nav-link-item" href="/gestionmascota/lista"><i class="bi bi-github me-1"></i>Mascotas</a></li>
+	        <li class="nav-item"><a class="nav-link nav-link-item" href="/gestionmedico/lista"><i class="bi bi-person-badge me-1"></i>Médicos</a></li>
+	        <li class="nav-item"><a class="nav-link nav-link-item" href="/gestionusuario/lista"><i class="bi bi-person-gear me-1"></i>Usuarios</a></li>
+	      </ul>
+	      <a href="/inicioSesion/logout" class="btn btn-outline-light btn-sm rounded-pill"><i class="bi bi-box-arrow-right me-1"></i>Cerrar Sesión</a>
+	    </div>
+	  </div>
+	</nav>
+	
+<div class="container-fluid px-4 pb-4">
 
-	<div class="card shadow">
+	<div class="card page-card">
 
-		<div class="card-header bg-primary text-white">
-			<h3 class="mb-0">Mantenimiento de Clientes</h3>
+		<div class="card-header d-flex align-items-center justify-content-between">
+		      <h5 class="mb-0 text-white fw-bold"><i class="bi bi-people-fill me-2"></i>Gestión de Clientes</h5>
+		      <span class="badge bg-white" style="color:#4facfe;">Módulo Clientes</span>
 		</div>
 
-		<div class="card-body">
-
-			<div class="alert alert-info">
-				<span th:text="Bienvenido"></span>
-			</div>
+		<div class="card-body p-4">
 
 			<div class="d-flex justify-content-between mb-3">
 
-				<div>
-					<button id="btnNuevo" 
-					class="btn btn-success" 
-					data-bs-toggle="modal" 
-					data-bs-target="#ventanaModal">
-					
-					<i class="bi bi-plus-circle"></i>
-								Nuevo Cliente
-					</button>
-
-				</div>
+				<div class="mb-3">
+				        <button id="btnNuevo" class="btn btn-nuevo" data-bs-toggle="modal" data-bs-target="#ventanaModal">
+				          <i class="bi bi-plus-circle me-1"></i> Nuevo Cliente
+				        </button>
+				      </div>
 
 			</div>
 
@@ -50,7 +75,7 @@
 				los que llevan redirect.addFlashAttribute-->
 			<div id="msg"
 					th:if="${msg}"
-				class="alert alert-success alert-dismissible fade show">
+				class="alert alert-success alert-dismissible fade show ">
 						    <span th:text="${msg}"></span>
 						    <button type="button"
 						            class="btn-close"
@@ -58,70 +83,64 @@
 						    </button>
 			</div>
 			<!--END-->
-			
-			<table id="tablaCliente"
-				class="table table-bordered table-hover table-striped">
-
-				<thead class="table-dark">
-
-					<tr>
-											<th>ID</th>
-											<th>Tipo Documento</th>
-											<th>Nº Doc</th>
-											<th>Nombres</th>
-											<th>Apellidos</th>
-											<th>Telefono</th>
-											<th>Correo</th>
-											<th>Dirección</th>
-											<th>Estado</th>			
-											<th>Acciones</th>		
-					</tr>
-
-				</thead>
-
-				<tbody>
-
-					<tr th:each="c:${clientes}">
-
-						<td th:text="${c.idCliente}"></td>
-						<td th:text="${c.tipoDocumento}"></td>
-						<td th:text="${c.numeroDocumento}"></td>
-						<td th:text="${c.nombres}"></td>
-						<td th:text="${c.apellidos}"></td>
-						<td th:text="${c.telefono}"></td>
-						<td th:text="${c.correo}"></td>
-						<td th:text="${c.direccion}"></td>	
-
-						<td>
-							<!--If Ternario, para cambiar el color al estado-->
-							<span class="badge bg-success"
-								th:classappend="${c.estado=='ACTIVO'} ? 'bg-success' : ' bg-danger'"
-								th:text="${c.estado}">
-							</span>
-						</td>
-
-						<td>
-							<!--Editar-->
-							<!--btn es para el script-->
-							<button class="btn btn-warning btn-sm btnEditar"
-									th:data-id="${c.idCliente}">
-									<i class="bi bi-pencil-square"></i>
-								</button>
-								<!--Eliminar-->
+			<di class="table-responsive">
+				<table id="tablaCliente"
+					class="table table-bordered table-hover table-striped table-hover align-middle">
+	
+					<thead class="table-dark">
+	
+						<tr>
+							<th>ID</th>
+							<th>Tipo Documento</th>
+							<th>Nº Doc</th>
+							<th>Nombres</th>
+							<th>Apellidos</th>
+							<th>Telefono</th>
+							<th>Correo</th>
+							<th>Dirección</th>
+							<th>Estado</th>			
+							<th>Acciones</th>		
+						</tr>
+	
+					</thead>
+	
+					<tbody>
+	
+						<tr th:each="c:${clientes}">
+							<td th:text="${c.idCliente}"></td>
+							<td th:text="${c.tipoDocumento}"></td>
+							<td th:text="${c.numeroDocumento}"></td>
+							<td th:text="${c.nombres}"></td>
+							<td th:text="${c.apellidos}"></td>
+							<td th:text="${c.telefono}"></td>
+							<td th:text="${c.correo}"></td>
+							<td th:text="${c.direccion}"></td>	
+							<td>
+								<!--If Ternario, para cambiar el color al estado-->
+								<span class="badge rounded-pill"
+									th:classappend="${c.estado=='ACTIVO'} ? 'bg-success' : ' bg-danger'"
+									th:text="${c.estado}">
+								</span>
+							</td>
+	
+							<td>
+								<!--Editar-->
 								<!--btn es para el script-->
-								<button class="btn btn-danger btn-sm btnEliminar"
+								<button class="btn btn-warning btn-sm btnEditar"
 										th:data-id="${c.idCliente}">
-									<i class="bi bi-trash"></i>
-								</button>
-
-						</td>
-
-					</tr>
-
-				</tbody>
-
-			</table>
-
+										<i class="bi bi-pencil-square"></i>
+									</button>
+									<!--Eliminar-->
+									<!--btn es para el script-->
+									<button class="btn btn-danger btn-sm btnEliminar"
+											th:data-id="${c.idCliente}">
+										<i class="bi bi-trash"></i>
+									</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 		</div>
 
 	</div>
@@ -232,7 +251,7 @@ $(document).ready(function() {
 				<div class="modal-header">
 					<!--Agregar #tituloModal del script js Editar 
 						para cambiarle el nombre a Editar Cliente-->
-					<h5 class="modal-title" id="tituloModal">
+					<h5 class="modal-title" id="tituloModal"><i class="bi bi-person-plus-fill me-2"></i>
 						Registrar Cliente
 					</h5>
 					<button type="button"
@@ -242,75 +261,42 @@ $(document).ready(function() {
 				</div>
 			
 			
-				<div class="modal-body">
-					<div class="row">
+				<div class="modal-body p-4">
+					<div class="row g-3">
 						<!---->
-						<div class="col-md-6 mb-3">
-							
-							<!-- BomboBox innecesario cuando se requiera usar una 
-								instancia de clase, en la principal -->
-							<!--
-							<label>Marca Bus</label>
-							/*poner id en select*/
-							<select class="form-select">
-							/*No olvidar poner el en value="0" y seleccione marca, esto va por el indice
-							Seleccione Cliente es indice 0 */
-								<option value="">
-									Seleccione Cliente
-								</option>
-								<option
-									th:each="xxxxxxxxxxx"
-									th:value="xxxxxxxxxxx"
-									th:text="xxxxxxxxxxxx">
-								</option>
-							</select>
+						<div class="col-md-6">
+						<label class="form-label">Tipo Documento</label>
+						<select id="tipoDocumento" class="form-select" th:field="*{tipoDocumento}">
+							<option value="DNI">DNI</option>
+							<option value="CE">CE</option>
+						</select>
 						</div>
-							-->
-						
-						<!---->
-						<div class="col-md-6 mb-3">
-							<label>Tipo Documento</label>
-							<select id="tipoDocumento" class="form-select" th:field="*{tipoDocumento}">
-								<!--No olvidar el Value para que se guarde el texto-->
-								<option value="DNI">DNI</option>
-								<option value="CE">CE</option>
-							</select>
+						<div class="col-md-6">
+							<label class="form-label">Num Documento</label>
+							<input id="numeroDocumento" type="text" class="form-control" th:field="*{numeroDocumento}" placeholder="Nº de documento">
 						</div>
-						<!---->
-						<div class="col-md-6 mb-3">
-							<label>Num Documento</label>
-							<input id="numeroDocumento" type="text" class="form-control" th:field="*{numeroDocumento}">
+						<div class="col-md-6">
+							<label class="form-label">Nombres</label>
+							<input id="nombres" type="text" class="form-control" th:field="*{nombres}" placeholder="Nombres del cliente">
 						</div>
-						<!---->
-						<div class="col-md-6 mb-3">
-							<label>Nombres</label>
-							<input id="nombres" type="text" class="form-control" th:field="*{nombres}">
-						</div>
-						<!---->
-						<div class="col-md-6 mb-3">
-							<label>Apellidos</label>
-							<input id="apellidos" type="text" class="form-control" th:field="*{apellidos}">
+						<div class="col-md-6">
+							<label class="form-label">Apellidos</label>
+							<input id="apellidos" type="text" class="form-control" th:field="*{apellidos}" placeholder="Apellidos del cliente">
 						</div>										
-						<!---->
-						<div class="col-md-6 mb-3">
-							<label>Teléfono</label>
-							<input id="telefono" type="text" class="form-control" th:field="*{telefono}">
+						<div class="col-md-6">
+							<label class="form-label">Teléfono</label>
+							<input id="telefono" type="text" class="form-control" th:field="*{telefono}" placeholder="Número de contacto">
 						</div>
-						<!---->
-						<div class="col-md-6 mb-3">
-							<label>Correo</label>
-							<input id="correo" type="email" class="form-control" th:field="*{correo}">
+						<div class="col-md-6">
+							<label class="form-label">Correo</label>
+							<input id="correo" type="email" class="form-control" th:field="*{correo}" placeholder="ejemplo@correo.com">
 						</div>
-						<!---->
-						
-						<div class="col-md-6 mb-3">
-							<label>Dirección</label>
-							<input id="direccion" type="text" class="form-control" th:field="*{direccion}">
+						<div class="col-md-6">
+							<label class="form-label">Dirección</label>
+							<input id="direccion" type="text" class="form-control" th:field="*{direccion}" placeholder="Dirección completa">
 						</div>
-						<!---->
-						<div class="col-md-6 mb-3">
-							<label>Estado</label>
-							<!--No olvidar el Value para que se guarde el texto-->
+						<div class="col-md-6">
+							<label class="form-label">Estado</label>
 							<select id="estado" class="form-select" th:field="*{estado}">
 								<option value="ACTIVO">ACTIVO</option>
 								<option value="INACTIVO">INACTIVO</option>
@@ -319,13 +305,13 @@ $(document).ready(function() {
 					</div>
 				</div>
 
-				<div class="modal-footer">
+				<div class="modal-footer bg-light">
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
 						Cerrar
 					</button>
 					<!--Cambiar button por submit-->
 					<button type="submit"
-							class="btn btn-primary">
+							class="btn btn-primary px-4"><i class="bi bi-save me-1"></i>
 						Guardar
 				</button>
 				</div>
